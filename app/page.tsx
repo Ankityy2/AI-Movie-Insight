@@ -38,6 +38,36 @@ export default function Home() {
 
     setLoading(false);
   };
+  const rating = parseFloat(omdbData.imdbRating);
+
+const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  },
+  body: JSON.stringify({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: "You are a professional movie critic AI.",
+      },
+      {
+        role: "user",
+        content: `Based on this movie plot, write a short 3-4 line audience sentiment summary and classify overall sentiment as Positive, Mixed, or Negative:\n\n${omdbData.Plot}`,
+      },
+    ],
+  }),
+});
+
+const openaiData = await openaiRes.json();
+
+const aiSummary = openaiData.choices?.[0]?.message?.content || "AI summary unavailable.";
+
+let sentiment = "Mixed";
+if (rating >= 7.5) sentiment = "Positive";
+if (rating < 5) sentiment = "Negative";
 
   return (
 
