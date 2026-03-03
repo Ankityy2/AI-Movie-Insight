@@ -28,148 +28,128 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error);
+        setError(data.error || "Something went wrong");
       } else {
         setMovie(data);
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError("Server error. Please try again.");
     }
 
     setLoading(false);
   };
-  const rating = parseFloat(omdbData.imdbRating);
-
-const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-  },
-  body: JSON.stringify({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are a professional movie critic AI.",
-      },
-      {
-        role: "user",
-        content: `Based on this movie plot, write a short 3-4 line audience sentiment summary and classify overall sentiment as Positive, Mixed, or Negative:\n\n${omdbData.Plot}`,
-      },
-    ],
-  }),
-});
-
-const openaiData = await openaiRes.json();
-
-const aiSummary = openaiData.choices?.[0]?.message?.content || "AI summary unavailable.";
-
-let sentiment = "Mixed";
-if (rating >= 7.5) sentiment = "Positive";
-if (rating < 5) sentiment = "Negative";
 
   return (
+    <div className="min-h-screen relative flex items-center justify-center bg-black text-white overflow-hidden px-4 py-16">
 
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 px-4 py-12">
-    {/* Glass Card */}
-    <div className="w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 text-white">
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-black to-blue-900/40 blur-3xl opacity-60"></div>
 
-      {/* Heading */}
-      <h1 className="text-4xl font-bold text-center mb-3">
-        AI Movie Insight Builder
-      </h1>
+      {/* Main Card */}
+      <div className="relative w-full max-w-3xl bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-10">
 
-      <p className="text-center text-gray-300 mb-8">
-        Explore movie details and audience sentiment instantly.
-      </p>
+        {/* Heading */}
+        <h1 className="text-5xl font-extrabold text-center mb-4 tracking-tight bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          AI Movie Insight Builder
+        </h1>
 
-      {/* Input Section */}
-      <div className="flex gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Enter IMDb ID (e.g. tt0133093)"
-          value={imdbId}
-          onChange={(e) => setImdbId(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") fetchMovie();
-          }}
-          className="flex-1 p-3 rounded-xl bg-black/30 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <p className="text-center text-gray-400 mb-10 text-lg">
+          Instantly analyze movies with real-time AI-powered audience insights.
+        </p>
 
-        <button
-          onClick={fetchMovie}
-          className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition duration-200 font-semibold"
-        >
-          Search
-        </button>
-      </div>
-
-      {/* Loading */}
-      {loading && (
-        <div className="text-center text-gray-400 animate-pulse">
-          Fetching movie insights...
-        </div>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="text-center text-red-400 mt-4">
-          {error}
-        </div>
-      )}
-
-      {/* Movie Result */}
-      {movie && (
-       <div className="mt-8 bg-black/40 rounded-2xl p-6 transition duration-500 hover:scale-[1.02] animate-fadeIn">
-          
-          <img
-           src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/400x600?text=No+Image"}
-            alt="Poster"
-            className="rounded-xl mb-4 w-full object-cover"
+        {/* Search Section */}
+        <div className="flex gap-4 mb-8">
+          <input
+            type="text"
+            placeholder="Enter IMDb ID (e.g. tt0133093)"
+            value={imdbId}
+            onChange={(e) => setImdbId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") fetchMovie();
+            }}
+            className="flex-1 px-5 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
 
-          <h2 className="text-2xl font-semibold mb-1">
-            {movie.title}
-          </h2>
+          <button
+            onClick={fetchMovie}
+            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105 hover:shadow-xl transition duration-300 font-semibold"
+          >
+            Analyze
+          </button>
+        </div>
 
-          <p className="text-gray-400 mb-2">
-            {movie.year} • IMDb Rating: {movie.rating}
-          </p>
+        {/* Loading */}
+        {loading && (
+          <div className="text-center text-gray-400 animate-pulse">
+            Fetching movie insights...
+          </div>
+        )}
 
-          <p className="text-gray-300">
-            <span className="font-semibold">Cast:</span> {movie.cast}
-          </p>
+        {/* Error */}
+        {error && (
+          <div className="text-center text-red-400 mt-4">
+            {error}
+          </div>
+        )}
 
-          <p className="mt-4 text-gray-300">
-            {movie.plot}
-          </p>
+        {/* Result Section */}
+        {movie && (
+          <div className="mt-10 bg-white/5 rounded-3xl p-8 border border-white/10 animate-fadeIn">
 
-          <div className="mt-6">
-            <p className="font-semibold">AI Summary:</p>
-            <p className="text-gray-300 mt-1">
-              {movie.aiSummary}
-            </p>
+            <div className="grid md:grid-cols-2 gap-8 items-start">
 
-            <div className="mt-4">
-              <span className="font-semibold">Sentiment: </span>
-              <span
-                className={`px-4 py-1 rounded-full text-sm font-semibold ${
-                  movie.sentiment === "Positive"
-                    ? "bg-green-600"
-                    : movie.sentiment === "Mixed"
-                    ? "bg-yellow-500 text-black"
-                    : "bg-red-600"
-                }`}
-              >
-                {movie.sentiment}
-              </span>
+              <img
+                src={
+                  movie.poster !== "N/A"
+                    ? movie.poster
+                    : "https://via.placeholder.com/400x600?text=No+Image"
+                }
+                alt="Poster"
+                className="rounded-2xl shadow-xl"
+              />
+
+              <div>
+                <h2 className="text-3xl font-bold mb-2">
+                  {movie.title}
+                </h2>
+
+                <p className="text-gray-400 mb-4">
+                  {movie.year} • IMDb {movie.rating}
+                </p>
+
+                <p className="text-gray-300 mb-4">
+                  <span className="font-semibold">Cast:</span> {movie.cast}
+                </p>
+
+                <p className="text-gray-300 leading-relaxed mb-6">
+                  {movie.plot}
+                </p>
+
+                <div className="bg-white/10 p-5 rounded-2xl border border-white/10">
+                  <p className="font-semibold mb-2">AI Summary</p>
+                  <p className="text-gray-300 mb-4">
+                    {movie.aiSummary}
+                  </p>
+
+                  <span
+                    className={`inline-block px-5 py-2 rounded-full text-sm font-semibold ${
+                      movie.sentiment === "Positive"
+                        ? "bg-green-600"
+                        : movie.sentiment === "Mixed"
+                        ? "bg-yellow-500 text-black"
+                        : "bg-red-600"
+                    }`}
+                  >
+                    {movie.sentiment}
+                  </span>
+                </div>
+              </div>
+
             </div>
           </div>
-        </div>
-      )}
+        )}
 
+      </div>
     </div>
-  </div>
-);
+  );
 }
