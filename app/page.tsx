@@ -98,15 +98,16 @@ export default function Home() {
 
             <div className="grid md:grid-cols-2 gap-8 items-start">
 
+
               <img
-                src={
-                  movie.poster && movie.poster !== "N/A"
-                    ? movie.poster
-                    : "/no-poster.png"
-                }
+                src={movie.poster}
                 alt={movie.title}
                 className="rounded-2xl shadow-xl"
+                onError={(e) => {
+                  e.currentTarget.src = "https://via.placeholder.com/400x600?text=No+Poster";
+                }}
               />
+
 
 
               <div>
