@@ -100,13 +100,14 @@ export default function Home() {
 
               <img
                 src={
-                  movie.poster !== "N/A"
+                  movie.poster && movie.poster !== "N/A"
                     ? movie.poster
-                    : "https://via.placeholder.com/400x600?text=No+Image"
+                    : "/no-poster.png"
                 }
-                alt="Poster"
+                alt={movie.title}
                 className="rounded-2xl shadow-xl"
               />
+
 
               <div>
                 <h2 className="text-3xl font-bold mb-2">
@@ -132,13 +133,12 @@ export default function Home() {
                   </p>
 
                   <span
-                    className={`inline-block px-5 py-2 rounded-full text-sm font-semibold ${
-                      movie.sentiment === "Positive"
-                        ? "bg-green-600"
-                        : movie.sentiment === "Mixed"
+                    className={`inline-block px-5 py-2 rounded-full text-sm font-semibold ${movie.sentiment === "Positive"
+                      ? "bg-green-600"
+                      : movie.sentiment === "Mixed"
                         ? "bg-yellow-500 text-black"
                         : "bg-red-600"
-                    }`}
+                      }`}
                   >
                     {movie.sentiment}
                   </span>
@@ -152,4 +152,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
+} 
